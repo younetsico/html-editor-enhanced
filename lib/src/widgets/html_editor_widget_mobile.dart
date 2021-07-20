@@ -9,8 +9,8 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:html_editor_enhanced/src/widgets/toolbar_widget.dart';
-import 'package:html_editor_enhanced/utils/utils.dart';
 import 'package:html_editor_enhanced/utils/plugins.dart';
+import 'package:html_editor_enhanced/utils/utils.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 /// The HTML Editor widget itself, for mobile (uses InAppWebView)
@@ -23,6 +23,7 @@ class HtmlEditorWidget extends StatefulWidget {
     required this.htmlEditorOptions,
     required this.htmlToolbarOptions,
     required this.otherOptions,
+    this.additionalHeaders,
   }) : super(key: key);
 
   final HtmlEditorController controller;
@@ -31,6 +32,7 @@ class HtmlEditorWidget extends StatefulWidget {
   final HtmlEditorOptions htmlEditorOptions;
   final HtmlToolbarOptions htmlToolbarOptions;
   final OtherOptions otherOptions;
+  final Map<String, String>? additionalHeaders;
 
   @override
   _HtmlEditorWidgetMobileState createState() => _HtmlEditorWidgetMobileState();
@@ -120,6 +122,11 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
               Expanded(
                 child: InAppWebView(
                   initialFile: filePath,
+                  onReceivedHttpAuthRequest: (controller, challenge) async {
+                    print('[HTML_EDITOR] onReceivedHttpAuthRequest');
+
+                    return null;
+                  },
                   onWebViewCreated: (InAppWebViewController controller) {
                     widget.controller.editorController = controller;
                     controller.addJavaScriptHandler(
@@ -136,6 +143,11 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                       crossPlatform: InAppWebViewOptions(
                         javaScriptEnabled: true,
                         transparentBackground: true,
+                        useShouldOverrideUrlLoading: true,
+                        useShouldInterceptFetchRequest: true,
+                        useShouldInterceptAjaxRequest: true,
+                        useOnLoadResource: true,
+                        useOnDownloadStart: true,
                       ),
                       android: AndroidInAppWebViewOptions(
                         useHybridComposition: true,
@@ -452,6 +464,39 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                             }
                           });
                     }
+                  },
+                  onLoadStart: (controller, uri) {
+                    print('[HTML_EDITOR] onLoadStart: ${uri!.path}');
+                  },
+                  onLoadResource: (controller, loadedResource) {
+                    print('[HTML_EDITOR] onLoadResource: ${loadedResource.url!.path}');
+                  },
+                  onDownloadStart: (controller, url) {
+                    print('[HTML_EDITOR] onDownloadStart: ${url}');
+                  },
+                  shouldInterceptFetchRequest: (controller, fetchReq) async {
+                    print('[HTML_EDITOR] Fetch: ${fetchReq.url!.path}');
+
+                    return fetchReq;
+                  },
+                  shouldInterceptAjaxRequest: (controller, ajaxReq) async {
+                    print('[HTML_EDITOR] Ajax request: ${ajaxReq.url!.path}');
+
+                    return ajaxReq;
+                  },
+                  shouldOverrideUrlLoading: (controller, navAction) async {
+                    print('[HTML_EDITOR] ${navAction.request.url}');
+                    print('[HTML_EDITOR] ${widget.additionalHeaders}');
+
+                    if (navAction.request.url!.path.contains('dav/files/')) {
+                      print('[HTML_EDITOR] override image loading: ${navAction.request.url?.path}');
+                      navAction.request.headers!.addAll(widget.additionalHeaders ?? {});
+                      controller.loadUrl(urlRequest: navAction.request);
+
+                      return NavigationActionPolicy.CANCEL;
+                    }
+
+                    return NavigationActionPolicy.ALLOW;
                   },
                 ),
               ),
