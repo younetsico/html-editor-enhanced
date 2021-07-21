@@ -112,12 +112,12 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
           child: Column(
             children: [
               widget.htmlToolbarOptions.toolbarPosition ==
-                      ToolbarPosition.aboveEditor
+                  ToolbarPosition.aboveEditor
                   ? ToolbarWidget(
-                      key: toolbarKey,
-                      controller: widget.controller,
-                      htmlToolbarOptions: widget.htmlToolbarOptions,
-                      callbacks: widget.callbacks)
+                  key: toolbarKey,
+                  controller: widget.controller,
+                  htmlToolbarOptions: widget.htmlToolbarOptions,
+                  callbacks: widget.callbacks)
                   : Container(height: 0, width: 0),
               Expanded(
                 child: InAppWebView(
@@ -154,11 +154,11 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                         loadWithOverviewMode: true,
                       )),
                   initialUserScripts:
-                      widget.htmlEditorOptions.mobileInitialScripts,
+                  widget.htmlEditorOptions.mobileInitialScripts,
                   contextMenu: widget.htmlEditorOptions.mobileContextMenu,
                   gestureRecognizers: {
                     Factory<VerticalDragGestureRecognizer>(
-                        () => VerticalDragGestureRecognizer()),
+                            () => VerticalDragGestureRecognizer()),
                     Factory<LongPressGestureRecognizer>(() =>
                         LongPressGestureRecognizer(
                             duration: widget
@@ -171,8 +171,8 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                     if (widget.htmlEditorOptions.shouldEnsureVisible &&
                         Scrollable.of(context) != null) {
                       await Scrollable.of(context)!.position.ensureVisible(
-                            context.findRenderObject()!,
-                          );
+                        context.findRenderObject()!,
+                      );
                     }
                     if (widget.htmlEditorOptions.adjustHeightForKeyboard &&
                         mounted) {
@@ -185,7 +185,7 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                         //todo add support for traditional summernote controls again?
                         await controller.evaluateJavascript(
                             source:
-                                "\$('div.note-editable').outerHeight(${max(docHeight - (toolbarKey.currentContext?.size?.height ?? 0), 30)});");
+                            "\$('div.note-editable').outerHeight(${max(docHeight - (toolbarKey.currentContext?.size?.height ?? 0), 30)});");
                       }
                     }
                   },
@@ -206,22 +206,22 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                               (p == widget.plugins.last
                                   ? ']]\n'
                                   : p.getToolbarString().isNotEmpty
-                                      ? ', '
-                                      : '');
+                                  ? ', '
+                                  : '');
                           if (p is SummernoteAtMention) {
                             summernoteCallbacks = summernoteCallbacks +
                                 """
-                              \nsummernoteAtMention: {
-                                getSuggestions: async function(value) {
-                                  var result = await window.flutter_inappwebview.callHandler('getSuggestions', value);
-                                  var resultList = result.split(',');
-                                  return resultList;
+                                \nsummernoteAtMention: {
+                                  getSuggestions: async function(value) {
+                                    var result = await window.flutter_inappwebview.callHandler('getSuggestions', value);
+                                    var resultList = result.split(',');
+                                    return resultList;
+                                  },
+                                  onSelect: (value) => {
+                                    window.flutter_inappwebview.callHandler('onSelectMention', value);
+                                  },
                                 },
-                                onSelect: (value) => {
-                                  window.flutter_inappwebview.callHandler('onSelectMention', value);
-                                },
-                              },
-                            """;
+                              """;
                             controller.addJavaScriptHandler(
                                 handlerName: 'getSuggestions',
                                 callback: (value) {
@@ -245,151 +245,151 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                         if (widget.callbacks!.onImageLinkInsert != null) {
                           summernoteCallbacks = summernoteCallbacks +
                               """
-                              onImageLinkInsert: function(url) {
-                                window.flutter_inappwebview.callHandler('onImageLinkInsert', url);
-                              },
-                            """;
+                                onImageLinkInsert: function(url) {
+                                  window.flutter_inappwebview.callHandler('onImageLinkInsert', url);
+                                },
+                              """;
                         }
                         if (widget.callbacks!.onImageUpload != null) {
                           summernoteCallbacks = summernoteCallbacks +
                               """
-                              onImageUpload: function(files) {
-                                var reader = new FileReader();
-                                var base64 = "<an error occurred>";
-                                reader.onload = function (_) {
-                                  base64 = reader.result;
-                                  var newObject = {
-                                     'lastModified': files[0].lastModified,
-                                     'lastModifiedDate': files[0].lastModifiedDate,
-                                     'name': files[0].name,
-                                     'size': files[0].size,
-                                     'type': files[0].type,
-                                     'base64': base64
+                                onImageUpload: function(files) {
+                                  var reader = new FileReader();
+                                  var base64 = "<an error occurred>";
+                                  reader.onload = function (_) {
+                                    base64 = reader.result;
+                                    var newObject = {
+                                       'lastModified': files[0].lastModified,
+                                       'lastModifiedDate': files[0].lastModifiedDate,
+                                       'name': files[0].name,
+                                       'size': files[0].size,
+                                       'type': files[0].type,
+                                       'base64': base64
+                                    };
+                                    window.flutter_inappwebview.callHandler('onImageUpload', JSON.stringify(newObject));
                                   };
-                                  window.flutter_inappwebview.callHandler('onImageUpload', JSON.stringify(newObject));
-                                };
-                                reader.onerror = function (_) {
-                                  var newObject = {
-                                     'lastModified': files[0].lastModified,
-                                     'lastModifiedDate': files[0].lastModifiedDate,
-                                     'name': files[0].name,
-                                     'size': files[0].size,
-                                     'type': files[0].type,
-                                     'base64': base64
+                                  reader.onerror = function (_) {
+                                    var newObject = {
+                                       'lastModified': files[0].lastModified,
+                                       'lastModifiedDate': files[0].lastModifiedDate,
+                                       'name': files[0].name,
+                                       'size': files[0].size,
+                                       'type': files[0].type,
+                                       'base64': base64
+                                    };
+                                    window.flutter_inappwebview.callHandler('onImageUpload', JSON.stringify(newObject));
                                   };
-                                  window.flutter_inappwebview.callHandler('onImageUpload', JSON.stringify(newObject));
-                                };
-                                reader.readAsDataURL(files[0]);
-                              },
-                            """;
+                                  reader.readAsDataURL(files[0]);
+                                },
+                              """;
                         }
                         if (widget.callbacks!.onImageUploadError != null) {
                           summernoteCallbacks = summernoteCallbacks +
                               """
-                                onImageUploadError: function(file, error) {
-                                  if (typeof file === 'string') {
-                                    window.flutter_inappwebview.callHandler('onImageUploadError', file, error);
-                                  } else {
-                                    var newObject = {
-                                       'lastModified': file.lastModified,
-                                       'lastModifiedDate': file.lastModifiedDate,
-                                       'name': file.name,
-                                       'size': file.size,
-                                       'type': file.type,
-                                    };
-                                    window.flutter_inappwebview.callHandler('onImageUploadError', JSON.stringify(newObject), error);
-                                  }
-                                },
-                            """;
+                                  onImageUploadError: function(file, error) {
+                                    if (typeof file === 'string') {
+                                      window.flutter_inappwebview.callHandler('onImageUploadError', file, error);
+                                    } else {
+                                      var newObject = {
+                                         'lastModified': file.lastModified,
+                                         'lastModifiedDate': file.lastModifiedDate,
+                                         'name': file.name,
+                                         'size': file.size,
+                                         'type': file.type,
+                                      };
+                                      window.flutter_inappwebview.callHandler('onImageUploadError', JSON.stringify(newObject), error);
+                                    }
+                                  },
+                              """;
                         }
                       }
                       summernoteToolbar = summernoteToolbar + '],';
                       summernoteCallbacks = summernoteCallbacks + '}';
                       await controller.evaluateJavascript(source: """
-                          \$('#summernote-2').summernote({
-                              placeholder: "${widget.htmlEditorOptions.hint ?? ""}",
-                              tabsize: 2,
-                              height: ${widget.otherOptions.height - (toolbarKey.currentContext?.size?.height ?? 0)},
-                              toolbar: $summernoteToolbar
-                              disableGrammar: false,
-                              spellCheck: false,
-                              maximumFileSize: $maximumFileSize,
-                              $summernoteCallbacks
-                          });
-                          
-                          \$('#summernote-2').on('summernote.change', function(_, contents, \$editable) {
-                            window.flutter_inappwebview.callHandler('onChangeContent', contents);
-                          });
-                      
-                          function onSelectionChange() {
-                            let {anchorNode, anchorOffset, focusNode, focusOffset} = document.getSelection();
-                            var isBold = false;
-                            var isItalic = false;
-                            var isUnderline = false;
-                            var isStrikethrough = false;
-                            var isSuperscript = false;
-                            var isSubscript = false;
-                            var isUL = false;
-                            var isOL = false;
-                            var isLeft = false;
-                            var isRight = false;
-                            var isCenter = false;
-                            var isFull = false;
-                            var parent;
-                            var fontName;
-                            var fontSize = 16;
-                            var foreColor = "000000";
-                            var backColor = "FFFF00";
-                            var focusNode2 = \$(window.getSelection().focusNode);
-                            var parentList = focusNode2.closest("div.note-editable ol, div.note-editable ul");
-                            var parentListType = parentList.css('list-style-type');
-                            var lineHeight = \$(focusNode.parentNode).css('line-height');
-                            var direction = \$(focusNode.parentNode).css('direction');
-                            if (document.queryCommandState) {
-                              isBold = document.queryCommandState('bold');
-                              isItalic = document.queryCommandState('italic');
-                              isUnderline = document.queryCommandState('underline');
-                              isStrikethrough = document.queryCommandState('strikeThrough');
-                              isSuperscript = document.queryCommandState('superscript');
-                              isSubscript = document.queryCommandState('subscript');
-                              isUL = document.queryCommandState('insertUnorderedList');
-                              isOL = document.queryCommandState('insertOrderedList');
-                              isLeft = document.queryCommandState('justifyLeft');
-                              isRight = document.queryCommandState('justifyRight');
-                              isCenter = document.queryCommandState('justifyCenter');
-                              isFull = document.queryCommandState('justifyFull');
+                            \$('#summernote-2').summernote({
+                                placeholder: "${widget.htmlEditorOptions.hint ?? ""}",
+                                tabsize: 2,
+                                height: ${widget.otherOptions.height - (toolbarKey.currentContext?.size?.height ?? 0)},
+                                toolbar: $summernoteToolbar
+                                disableGrammar: false,
+                                spellCheck: false,
+                                maximumFileSize: $maximumFileSize,
+                                $summernoteCallbacks
+                            });
+                            
+                            \$('#summernote-2').on('summernote.change', function(_, contents, \$editable) {
+                              window.flutter_inappwebview.callHandler('onChangeContent', contents);
+                            });
+                        
+                            function onSelectionChange() {
+                              let {anchorNode, anchorOffset, focusNode, focusOffset} = document.getSelection();
+                              var isBold = false;
+                              var isItalic = false;
+                              var isUnderline = false;
+                              var isStrikethrough = false;
+                              var isSuperscript = false;
+                              var isSubscript = false;
+                              var isUL = false;
+                              var isOL = false;
+                              var isLeft = false;
+                              var isRight = false;
+                              var isCenter = false;
+                              var isFull = false;
+                              var parent;
+                              var fontName;
+                              var fontSize = 16;
+                              var foreColor = "000000";
+                              var backColor = "FFFF00";
+                              var focusNode2 = \$(window.getSelection().focusNode);
+                              var parentList = focusNode2.closest("div.note-editable ol, div.note-editable ul");
+                              var parentListType = parentList.css('list-style-type');
+                              var lineHeight = \$(focusNode.parentNode).css('line-height');
+                              var direction = \$(focusNode.parentNode).css('direction');
+                              if (document.queryCommandState) {
+                                isBold = document.queryCommandState('bold');
+                                isItalic = document.queryCommandState('italic');
+                                isUnderline = document.queryCommandState('underline');
+                                isStrikethrough = document.queryCommandState('strikeThrough');
+                                isSuperscript = document.queryCommandState('superscript');
+                                isSubscript = document.queryCommandState('subscript');
+                                isUL = document.queryCommandState('insertUnorderedList');
+                                isOL = document.queryCommandState('insertOrderedList');
+                                isLeft = document.queryCommandState('justifyLeft');
+                                isRight = document.queryCommandState('justifyRight');
+                                isCenter = document.queryCommandState('justifyCenter');
+                                isFull = document.queryCommandState('justifyFull');
+                              }
+                              if (document.queryCommandValue) {
+                                parent = document.queryCommandValue('formatBlock');
+                                fontSize = document.queryCommandValue('fontSize');
+                                foreColor = document.queryCommandValue('foreColor');
+                                backColor = document.queryCommandValue('hiliteColor');
+                                fontName = document.queryCommandValue('fontName');
+                              }
+                              var message = {
+                                'style': parent,
+                                'fontName': fontName,
+                                'fontSize': fontSize,
+                                'font': [isBold, isItalic, isUnderline],
+                                'miscFont': [isStrikethrough, isSuperscript, isSubscript],
+                                'color': [foreColor, backColor],
+                                'paragraph': [isUL, isOL],
+                                'listStyle': parentListType,
+                                'align': [isLeft, isCenter, isRight, isFull],
+                                'lineHeight': lineHeight,
+                                'direction': direction,
+                              };
+                              window.flutter_inappwebview.callHandler('FormatSettings', message);
                             }
-                            if (document.queryCommandValue) {
-                              parent = document.queryCommandValue('formatBlock');
-                              fontSize = document.queryCommandValue('fontSize');
-                              foreColor = document.queryCommandValue('foreColor');
-                              backColor = document.queryCommandValue('hiliteColor');
-                              fontName = document.queryCommandValue('fontName');
-                            }
-                            var message = {
-                              'style': parent,
-                              'fontName': fontName,
-                              'fontSize': fontSize,
-                              'font': [isBold, isItalic, isUnderline],
-                              'miscFont': [isStrikethrough, isSuperscript, isSubscript],
-                              'color': [foreColor, backColor],
-                              'paragraph': [isUL, isOL],
-                              'listStyle': parentListType,
-                              'align': [isLeft, isCenter, isRight, isFull],
-                              'lineHeight': lineHeight,
-                              'direction': direction,
-                            };
-                            window.flutter_inappwebview.callHandler('FormatSettings', message);
-                          }
-                      """);
+                        """);
                       await controller.evaluateJavascript(
                           source:
-                              "document.onselectionchange = onSelectionChange; console.log('done');");
+                          "document.onselectionchange = onSelectionChange; console.log('done');");
                       await controller.evaluateJavascript(
                           source:
-                              "document.getElementsByClassName('note-editable')[0].setAttribute('inputmode', '${describeEnum(widget.htmlEditorOptions.inputType)}');");
+                          "document.getElementsByClassName('note-editable')[0].setAttribute('inputmode', '${describeEnum(widget.htmlEditorOptions.inputType)}');");
                       if ((Theme.of(context).brightness == Brightness.dark ||
-                              widget.htmlEditorOptions.darkMode == true) &&
+                          widget.htmlEditorOptions.darkMode == true) &&
                           widget.htmlEditorOptions.darkMode != false) {
                         //todo fix for iOS (https://github.com/pichillilorenzo/flutter_inappwebview/issues/695)
                         var darkCSS =
@@ -412,22 +412,22 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                               } else {
                                 setState(mounted, this.setState, () {
                                   docHeight = (double.tryParse(
-                                              height.first.toString()) ??
-                                          widget.otherOptions.height) +
+                                      height.first.toString()) ??
+                                      widget.otherOptions.height) +
                                       (toolbarKey
-                                              .currentContext?.size?.height ??
+                                          .currentContext?.size?.height ??
                                           0);
                                 });
                               }
                             });
                         await controller.evaluateJavascript(
                             source:
-                                "var height = document.body.scrollHeight; window.flutter_inappwebview.callHandler('setHeight', height);");
+                            "var height = document.body.scrollHeight; window.flutter_inappwebview.callHandler('setHeight', height);");
                       }
                       //reset the editor's height if the keyboard disappears at any point
                       if (widget.htmlEditorOptions.adjustHeightForKeyboard) {
                         var keyboardVisibilityController =
-                            KeyboardVisibilityController();
+                        KeyboardVisibilityController();
                         keyboardVisibilityController.onChange
                             .listen((bool visible) {
                           if (!visible && mounted) {
@@ -454,8 +454,8 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                             if (widget.htmlEditorOptions.shouldEnsureVisible &&
                                 Scrollable.of(context) != null) {
                               Scrollable.of(context)!.position.ensureVisible(
-                                    context.findRenderObject()!,
-                                  );
+                                context.findRenderObject()!,
+                              );
                             }
                             if (widget.callbacks != null &&
                                 widget.callbacks!.onChangeContent != null) {
@@ -475,7 +475,10 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                     print('[HTML_EDITOR] onDownloadStart: ${url}');
                   },
                   shouldInterceptFetchRequest: (controller, fetchReq) async {
-                    print('[HTML_EDITOR] Fetch: ${fetchReq.url!.path}');
+                    print('[HTML_EDITOR] Fetch: ${fetchReq.url!.path}, ${fetchReq.headers}');
+
+                    fetchReq.headers!.addAll(widget.additionalHeaders!);
+                    print(fetchReq.headers);
 
                     return fetchReq;
                   },
@@ -501,12 +504,12 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                 ),
               ),
               widget.htmlToolbarOptions.toolbarPosition ==
-                      ToolbarPosition.belowEditor
+                  ToolbarPosition.belowEditor
                   ? ToolbarWidget(
-                      key: toolbarKey,
-                      controller: widget.controller,
-                      htmlToolbarOptions: widget.htmlToolbarOptions,
-                      callbacks: widget.callbacks)
+                  key: toolbarKey,
+                  controller: widget.controller,
+                  htmlToolbarOptions: widget.htmlToolbarOptions,
+                  callbacks: widget.callbacks)
                   : Container(height: 0, width: 0),
             ],
           ),
