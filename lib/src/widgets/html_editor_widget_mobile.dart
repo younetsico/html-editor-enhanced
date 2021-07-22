@@ -24,6 +24,7 @@ class HtmlEditorWidget extends StatefulWidget {
     required this.htmlToolbarOptions,
     required this.otherOptions,
     this.additionalHeaders,
+    this.bottomWidget
   }) : super(key: key);
 
   final HtmlEditorController controller;
@@ -33,6 +34,7 @@ class HtmlEditorWidget extends StatefulWidget {
   final HtmlToolbarOptions htmlToolbarOptions;
   final OtherOptions otherOptions;
   final Map<String, String>? additionalHeaders;
+  final Widget? bottomWidget;
 
   @override
   _HtmlEditorWidgetMobileState createState() => _HtmlEditorWidgetMobileState();
@@ -78,18 +80,18 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
       filePath = 'packages/html_editor_enhanced/assets/summernote.html';
     }
 
-
     super.initState();
-
     WidgetsBinding.instance!
         .addPostFrameCallback((_) => afterFirstLayout(context));
   }
 
   void afterFirstLayout(BuildContext context) {
-    widget.controller.editorController?.evaluateJavascript(source:
-    "\$('div.note-editable').outerHeight(${widget.otherOptions.height
-        - (toolbarKey.currentContext?.size?.height ?? 0)
-        - (bottomWidgetsKey.currentContext?.size?.height ?? 0)},});");
+    print('[HTML] afterFirstLayout');
+
+    // widget.controller.editorController?.evaluateJavascript(source:
+    // "\$('div.note-editable').outerHeight(${widget.otherOptions.height
+    //     - (toolbarKey.currentContext?.size?.height ?? 0)
+    //     - (bottomWidgetsKey.currentContext?.size?.height ?? 0)});");
   }
 
   @override
@@ -99,7 +101,7 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
   }
 
   /// resets the height of the editor to the original height
-  void resetHeight() async {
+  Future resetHeight() async {
     if (mounted) {
       print('[HTML_EDITOR] resetHeight: otherHeight: ${widget.otherOptions.height}');
       final bottomWidgetsHeight = bottomWidgetsKey.currentContext?.size?.height ?? 0;
@@ -109,13 +111,10 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
         this.setState(() {
           docHeight = widget.otherOptions.height;
         });
-        // await widget.controller.editorController!.evaluateJavascript(
-        //     source:
-        //     "\$('div.note-editable').outerHeight(${docHeight});");
 
         // await widget.controller.editorController!.evaluateJavascript(
         //     source:
-        //     "var height = document.body.scrollHeight; window.flutter_inappwebview.callHandler('setHeight', height);");
+        //     "\$('div.note-editable').outerHeight(${docHeight});");
       }
     }
   }
@@ -135,6 +134,16 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
         ' old otherHeight: ${oldWidget.otherOptions.height}');
 
     docHeight = widget.otherOptions.height;
+
+    if (docHeight > oldWidget.otherOptions.height) {
+      Future.delayed(const Duration(seconds: 2), () {
+        widget.controller.editorController?.evaluateJavascript(source:
+        "\$('div.note-editable').outerHeight(${widget.otherOptions.height
+            - (toolbarKey.currentContext?.size?.height ?? 0)
+            - (bottomWidgetsKey.currentContext?.size?.height ?? 0)});");
+      });
+    }
+
 
 
     super.didUpdateWidget(oldWidget);
@@ -564,8 +573,7 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
               ),
               Container(
                 key: bottomWidgetsKey,
-                height: 100,
-                color: Colors.yellow,
+                child: widget.bottomWidget,
               )
             ],
           ),

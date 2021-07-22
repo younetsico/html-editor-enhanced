@@ -17,7 +17,8 @@ class HtmlEditor extends StatelessWidget {
     this.htmlToolbarOptions = const HtmlToolbarOptions(),
     this.otherOptions = const OtherOptions(),
     this.plugins = const [],
-    this.additionalHeaders = const {}
+    this.additionalHeaders = const {},
+    this.bottomWidget
   }) : super(key: key);
 
   /// The controller that is passed to the widget, which allows multiple [HtmlEditor]
@@ -42,6 +43,8 @@ class HtmlEditor extends StatelessWidget {
 
   final Map<String, String> additionalHeaders;
 
+  final Widget? bottomWidget;
+
   @override
   Widget build(BuildContext context) {
     print('[HTML_EDITOR] html_editor_mobile build: ${otherOptions.height}');
@@ -54,7 +57,8 @@ class HtmlEditor extends StatelessWidget {
         htmlEditorOptions: htmlEditorOptions,
         htmlToolbarOptions: htmlToolbarOptions,
         otherOptions: otherOptions,
-        additionalHeaders: additionalHeaders
+        additionalHeaders: additionalHeaders,
+        bottomWidget: bottomWidget,
       );
     } else {
       return Text(
