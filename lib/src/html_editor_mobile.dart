@@ -44,6 +44,7 @@ class HtmlEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('[HTML_EDITOR] html_editor_mobile build: ${otherOptions.height}');
     if (!kIsWeb) {
       return HtmlEditorWidget(
         key: key,
