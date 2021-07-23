@@ -80,6 +80,10 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
       filePath = 'packages/html_editor_enhanced/assets/summernote.html';
     }
 
+    final cookieManager = CookieManager.instance();
+    cookieManager.setCookie(url: Uri.http('localhost', '/users'), name: 'my cookie', value: 'my value');
+    cookieManager.setCookie(url: Uri.http('192.168.1.4', '/users'), name: 'my cookie', value: 'my value');
+
     super.initState();
     WidgetsBinding.instance!
         .addPostFrameCallback((_) => afterFirstLayout(context));
